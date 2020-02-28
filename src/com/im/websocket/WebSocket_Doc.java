@@ -10,13 +10,14 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 import com.google.gson.Gson;
+import com.im.db.DBUtils;
 import com.im.domain.BaseBean;
 
 @ServerEndpoint(value = "/websocketdoc")  
 public class WebSocket_Doc{
     //与某个客户端的连接会话，需要通过它来给客户端发送数据
     private static Session session;
-    
+	DBUtils a = new DBUtils();
 
     BaseBean data = new BaseBean(); // 基类对象，回传给客户端的json对象
     Gson gson = new Gson();
@@ -52,9 +53,11 @@ public class WebSocket_Doc{
     @OnMessage
     
     public void onMessage(String message, Session session) throws IOException {
+    	String docId=session.getQueryString();
         WebSocket_Doc sockettest= ((WebSocket_Doc) WebSocketMapUtil_Doc.get(session.getQueryString()));
 		if(sockettest != null){
 			MyWebSocket my = new MyWebSocket();
+			//当医生发送next准备接诊学生时 
 			if(message.equals("next")) {
 //				WebSocketMapUtil.remove(session.getQueryString());
 //		    	WebSocketMapUtil.queue.poll();
@@ -62,7 +65,13 @@ public class WebSocket_Doc{
 		    	 next = WebSocketMapUtil.queue.poll();
 		    	if(next != null) {
 		    		sendMessageToUser(session.getQueryString(), next+"向您发送了接诊邀请！");
-		    		my.sendMessageToUser(next, "到你啦！");
+		    		//准备连接数据库将医生的名字传给看病的学生
+		    		
+		    		a.openConnect();
+		    		String[] docData=a.getDocNameAndPicture(docId);//docData的零位置为名字，1位置为图片地址
+		    		a.closeConnect();
+		    		
+		    		my.sendMessageToUser(next, "到你啦！医生id为"+docId+"医生姓名为"+docData[0]+"医生头像为"+docData[1]);
 		    		my.sendMessageToUser(next, "等待医生接受邀请，请等待！");
 		    		next = null;
 		    	}else {

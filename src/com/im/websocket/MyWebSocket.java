@@ -27,7 +27,7 @@ public class MyWebSocket{
     @OnOpen
     public void onOpen(Session session) throws Exception{
         this.session = session;
-        
+        System.out.println("the id is"+session.getQueryString());
         if(session.getQueryString().equals(WebSocketMapUtil.queue.peek())) {
         	sendMessageToUser(session.getQueryString(), "请勿重复点击挂号！");
         }
@@ -69,8 +69,10 @@ public class MyWebSocket{
     public void onClose() throws Exception{
     	//sendMessageToUser(session.getQueryString(), "close");
     	//从map中删除
-    	WebSocketMapUtil.remove(session.getQueryString());
-    	WebSocketMapUtil.queue.poll();
+    	String id=session.getQueryString();
+    	WebSocketMapUtil.remove(id);
+    	System.out.println("the remove id is "+session.getQueryString());
+    	WebSocketMapUtil.queue.remove(id);
 //    	String next = null;
 //    	 next = WebSocketMapUtil.queue.peek();
 //    	if(next != null) {
@@ -93,9 +95,15 @@ public class MyWebSocket{
         if(myWebSocket != null){
 			//myWebSocket.sendMessage("挂号成功！");
 			//myWebSocket.sendMessageAll("挂号人数：" + getCount() + "人");
-			String show = WebSocketMapUtil.show();
-			myWebSocket.sendMessage(show);
-			
+        	//如果用户发送了取消，则将他从队列中拿出来
+//        	if(message.equals("cancel")) {
+//        		WebSocketMapUtil.remove(id);
+//        		myWebSocket.sendMessage("取消挂号成功");
+//        		System.out.println("the stu persion is"+getCount());
+//        	}
+//        	
+        		String show = WebSocketMapUtil.show();
+        		myWebSocket.sendMessage(show);
 		}
     }
      

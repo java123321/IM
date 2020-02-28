@@ -68,6 +68,7 @@ public class DBUtils {
 		}
 		
 	
+		
 	
 
 	// 判断数据库中是否存在某个用户名及其密码,注册和登录的时候判断
@@ -96,7 +97,26 @@ public class DBUtils {
 
 	}
 
-	
+	//获取数据库中指定id的医生名字
+	public String[] getDocNameAndPicture(String id) {
+	String[] data=new String[2];
+
+		try {
+			sta = conn.createStatement(); // 执行SQL查询语句
+			rs = sta.executeQuery("select Doc_Name , Doc_Icon from im_doc where Doc_No="+id);
+			if (rs != null) {
+				while (rs.next()) { // 遍历结果集
+				data[0]=rs.getString("Doc_Name");
+				data[1]=rs.getString("Doc_Icon");
+				}
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+		}// 获得结果集
+		return data;
+	}
 	
 	// 判断数据库中是否存在某个用户名及其密码,注册和登录的时候判断
 		public boolean isExistInDB_Doc(String no, String pwd) {

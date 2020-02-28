@@ -40,7 +40,7 @@ public class Login extends HttpServlet{
 		}
 		a.openConnect();
 		// 打开数据库连接
-		
+	
 	
 		if(a.isExistInDB(no,pwd)) {
 			data.setCode(0);
@@ -50,6 +50,8 @@ public class Login extends HttpServlet{
 			data.setCode(-1);
 			data.setMsg("用户名或密码错误!!");
 		}
+		
+		a.closeConnect();//关闭数据库
 		Gson gson = new Gson();
 		String json = gson.toJson(data);
 		// 将对象转化成json字符串

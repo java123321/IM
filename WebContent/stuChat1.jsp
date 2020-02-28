@@ -7,7 +7,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <html>
   <head>
     <base href="<%=basePath%>">
-    <title>My WebSocket</title>
+    <title>stuChat1</title>
   </head>
    
   <body>
