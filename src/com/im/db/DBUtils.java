@@ -336,7 +336,7 @@ public class DBUtils {
        return array.toString();
     }
     
-    
+
     
     public String hexStr2Str(String hexStr) {
 		

@@ -20,10 +20,10 @@ import com.im.domain.BaseBean;
 @WebServlet("/GetDocInformation")
 public class GetDocInformation extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-    
+    		DBUtils a = new DBUtils();
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		DBUtils a = new DBUtils();
+
 		ResultSet rs = null;
 		
 		System.out.println("request--->"+request.getRequestURL()+"===="+request.getParameterMap().toString());
@@ -46,19 +46,16 @@ public class GetDocInformation extends HttpServlet {
 			// 打开数据库连接
 			
 			
-			try {
-				
+			try {				
 				rs = a.getData(sql);
 				data.setCode(0);
 				data.setMsg("获取信息成功！");
 			}
-			catch(Exception ee) {
-				
+			catch(Exception ee) {		
 				ee.printStackTrace();
 				data.setCode(-1);
 				data.setMsg("获取信息失败！");
-			}
-			
+			}			
 			String Doc = null;
 			try {
 				Doc = a.resultSetToJson( rs, String.valueOf(data.getCode()), data.getMsg());
