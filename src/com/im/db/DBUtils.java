@@ -159,6 +159,16 @@ public class DBUtils {
 		return false;
 	}
 		
+	public boolean insertOrdrToDataBase(String sql) {
+		try {
+			sta = conn.createStatement();
+			// 执行SQL查询语句
+			return sta.execute(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
 	public boolean insertDataToDB_Drug(String name, String price, String type, String describe, String amount, String index,String attribute,String id) {
 		String sql = " insert into im_drug ( Drug_Name , Drug_Price , Drug_Type , Drug_Describe , Drug_Amount , Drug_Index,Drug_OTC,Drug_Id) "
 				+ "values ( '" + name + "','" + price + "', '" + type + "', '" + describe + "', '" + amount + "', '" + index +"','"+attribute+"','"+id+ "');";
