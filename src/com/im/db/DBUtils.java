@@ -35,6 +35,8 @@ public class DBUtils {
 		}
 	}
 
+	
+
 
 	// 获得查询user表后的数据集
 	public ResultSet getUser() {
@@ -96,6 +98,8 @@ public class DBUtils {
 
 
 	}
+	
+	
 
 	//获取数据库中指定id的医生名字
 	public String[] getDocNameAndPicture(String id) {
@@ -163,7 +167,8 @@ public class DBUtils {
 		try {
 			sta = conn.createStatement();
 			// 执行SQL查询语句
-			return sta.execute(sql);
+			sta.execute(sql);		
+			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
