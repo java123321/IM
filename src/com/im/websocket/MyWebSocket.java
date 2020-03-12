@@ -40,7 +40,7 @@ public class MyWebSocket{
             }
         	else {
 		        sendMessageToUser(session.getQueryString(), "挂号成功！");
-		        sendMessageToUser(session.getQueryString(), "挂号人数：" + getCount() + "人");
+		        sendMessageToUser(session.getQueryString(), "您当前排队位次为" + getCount());
 		        sendMessageToUser(session.getQueryString(), "当前医生在线人数：" + WebSocket_Doc.getCount() + "人");
 		        
 //		        if(WebSocketMapUtil.queue.peek() == session.getQueryString()) {
@@ -67,18 +67,19 @@ public class MyWebSocket{
      */
     @OnClose
     public void onClose() throws Exception{
-    	//sendMessageToUser(session.getQueryString(), "close");
-    	//从map中删除
+    
+    	//将关闭的socket会话从map和queue中移除
     	String id=session.getQueryString();
     	WebSocketMapUtil.remove(id);
-    	System.out.println("the remove id is "+session.getQueryString());
     	WebSocketMapUtil.queue.remove(id);
-//    	String next = null;
-//    	 next = WebSocketMapUtil.queue.peek();
-//    	if(next != null) {
-//    		sendMessageToUser(next, "到你啦！");
-//    		next = null;
-//    	}
+    	System.out.println("the remove id is "+session.getQueryString());
+    	
+    	int i=1;
+    	for(String stuId:WebSocketMapUtil.queue) {
+    		WebSocketMapUtil.get(stuId).sendMessageToUser(stuId, "您当前排队位次为"+i);
+    		i++;
+    	}
+
     }
      
     /**

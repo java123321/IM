@@ -6,10 +6,11 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class WebSocketMapUtil {
 	public static ConcurrentMap<String, MyWebSocket> webSocketMap = new ConcurrentHashMap<>();
-	public static Queue<String> queue = new LinkedList<String>();
+	public static Queue<String> queue =new LinkedBlockingQueue();
     public static void put(String key, MyWebSocket myWebSocket){
     	webSocketMap.put(key, myWebSocket);
     	queue.offer(key);

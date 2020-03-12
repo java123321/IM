@@ -66,6 +66,9 @@ public class Message {
             webSocketSet.remove(userno);  //从set中删除
             subOnlineCount();           //在线数减1
             System.out.println("有一连接关闭！当前在线人数为" + getOnlineCount());
+            
+            
+            
         }
     }
 
@@ -101,8 +104,11 @@ public class Message {
         String sendMessage = message.split("[|]")[1];
         String now = getNowTime();
         try {
-            if (webSocketSet.get(sendUserno) != null) {
-            	webSocketSet.get(sendUserno).sendMessage(sendMessage);
+        	Message msgObject=webSocketSet.get(sendUserno);
+        	//如果要聊天的人在线，则给他发送消息
+            if (msgObject != null) {
+            	msgObject.sendMessage(sendMessage);          
+            	
                // webSocketSet.get(sendUserno).sendMessage(now + "用户" + userno + "发来消息：" + sendMessage);
                 //webSocketSet.get(userno).sendMessage(now + "向用户" + sendUserno + "发送消息：" + sendMessage);
             } else {
