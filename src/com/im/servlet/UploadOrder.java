@@ -23,52 +23,57 @@ import com.im.db.DBUtils;
  */
 @WebServlet("/UploadOrder")
 public class UploadOrder extends HttpServlet {
-	private boolean flag;
+	private boolean flag = true;
 	private DBUtils a = new DBUtils();
 	private static final long serialVersionUID = 1L;
-    public UploadOrder() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
+	private String sql;
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public UploadOrder() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		response.setContentType("text/html;charset=utf-8");
 		request.setCharacterEncoding("utf-8");
 		response.setCharacterEncoding("utf-8");
-		String order=request.getParameter("order");
-		System.out.println("order is "+order);
+		String order = request.getParameter("order");
+		String type = request.getParameter("type");
 		a.openConnect();
-		flag=true;
+		
 		try {
-			JSONArray jsonArray=new JSONArray(order);
-			JSONObject object=jsonArray.getJSONObject(0);
-			String stuId=object.getString("stuId");
-			for(int i=1;i<jsonArray.length();i++) {
-				object=jsonArray.getJSONObject(i);
-				String drugId=object.getString("drugId");
-				String drugAmount=object.getString("drugAmount");
-				Date time=new Date();
-				String sql="insert into im_order (DrugId,DrugAmount,DrugTime,StuId,Type,StuDelete,DocDelete) values ('"+drugId+"','"+drugAmount+"','"+String.valueOf(time.getTime())+"','"+stuId+"','notPost','false','false')";
-				System.out.println("orderSql is"+sql);
+			JSONArray jsonArray = new JSONArray(order);
+			JSONObject object = jsonArray.getJSONObject(0);
+			String stuId = object.getString("stuId");
+			Date time = new Date();
+			for (int i = 1; i < jsonArray.length(); i++) {
+				object = jsonArray.getJSONObject(i);
+				String drugId = object.getString("drugId");
+				String drugAmount = object.getString("drugAmount");
+				sql = "insert into im_order (DrugId,DrugAmount,DrugTime,StuId,Type,StuDelete,DocDelete) values ('"
+						+ drugId + "','" + drugAmount + "','" + String.valueOf(time.getTime()) + "','" + stuId + "','"
+						+ type + "','false','false')";
+				System.out.println("orderSql is" + sql);
 				a.insertOrdrToDataBase(sql);
-			}			
+			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			flag=false;
+			flag = false;
 		}
 		a.closeConnect();
-		PrintWriter out=response.getWriter();
-		if(flag) {
+		PrintWriter out = response.getWriter();
+		if (flag) {
 			out.println("订单添加成功");
-		}
-		else {
+		} else {
 			out.println("订单添加失败");
 		}
 		out.close();
 	}
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
