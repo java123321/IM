@@ -16,7 +16,7 @@ import com.im.domain.BaseBean;
 @ServerEndpoint(value = "/websocketdoc")  
 public class WebSocket_Doc{
     //与某个客户端的连接会话，需要通过它来给客户端发送数据
-    private static Session session;
+    private Session session;
 	DBUtils a = new DBUtils();
 
     BaseBean data = new BaseBean(); // 基类对象，回传给客户端的json对象
@@ -29,9 +29,10 @@ public class WebSocket_Doc{
      */
     @OnOpen
     public void onOpen(Session session) throws Exception{
-    	WebSocket_Doc.session = session;
+    	this.session = session;
     	WebSocketMapUtil_Doc.put(session.getQueryString(),this);
-        sendMessageToUser(session.getQueryString(), "上线成功！");
+       // sendMessageToUser(session.getQueryString(), "上线成功！");
+    	sendMessage("上线成功！");
         System.out.println(getSessionId());
     }
      
@@ -41,6 +42,7 @@ public class WebSocket_Doc{
      */
     @OnClose
     public void onClose() throws Exception{
+    	//当医生关闭连接后，将其从map去除
     	WebSocketMapUtil_Doc.remove(session.getQueryString());
     }
      
@@ -64,7 +66,9 @@ public class WebSocket_Doc{
 		    	String next = null;
 		    	 next = WebSocketMapUtil.queue.poll();
 		    	if(next != null) {
-		    		sendMessageToUser(session.getQueryString(), next+"向您发送了接诊邀请！");
+		    		//sendMessageToUser(session.getQueryString(), next+"向您发送了接诊邀请！");
+		    		sendMessage(next+"向您发送了接诊邀请！");
+		    		
 		    		//准备连接数据库将医生的名字传给看病的学生
 		    		
 		    		a.openConnect();
@@ -75,14 +79,17 @@ public class WebSocket_Doc{
 		    		my.sendMessageToUser(next, "等待医生接受邀请，请等待！");
 		    		next = null;
 		    	}else {
-		    		sendMessageToUser(session.getQueryString(), "当前没有人在挂号，请稍等！");
+		    		//sendMessageToUser(session.getQueryString(), "当前没有人在挂号，请稍等！");
+		    		sendMessage("当前没有人在挂号，请稍等！");
 		    	}
 			}
 			else {
 				
 				String show = WebSocketMapUtil.show();
-				sendMessageToUser(session.getQueryString(), "当前排队人数："+String.valueOf(my.getCount()));
-				sendMessageToUser(session.getQueryString(), "队列："+show);
+				//sendMessageToUser(session.getQueryString(), "当前排队人数："+String.valueOf(my.getCount()));
+				sendMessage("当前排队人数："+String.valueOf(my.getCount()));
+				//sendMessageToUser(session.getQueryString(), "队列："+show);
+				sendMessage("队列："+show);
 			}
 		}
     }
@@ -95,7 +102,13 @@ public class WebSocket_Doc{
     @OnError
     public void onError(Session session, Throwable error){
         error.printStackTrace();
-        sendMessageToUser(session.getQueryString(), "Doc:    "+error.getMessage());
+        //sendMessageToUser(session.getQueryString(), "Doc:    "+error.getMessage());
+        try {
+			sendMessage( "Doc:    "+error.getMessage());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
      
     
@@ -111,7 +124,7 @@ public class WebSocket_Doc{
     	
 		json = gson.toJson(data);
 		
-        WebSocket_Doc.session.getBasicRemote().sendText(json);
+        this.session.getBasicRemote().sendText(json);
     }
     
     /**
@@ -131,26 +144,26 @@ public class WebSocket_Doc{
     	
     }
     
-    public static void sendMessageToUser(String id,String message) {
-    	WebSocket_Doc sockettest;
-    	try {
-    		
-    		sockettest = WebSocketMapUtil_Doc.get(id);
-    		sockettest.sendMessage(message);
-    	}
-    	catch(Exception ee) {
-    		System.out.println("出错啦");
-    		ee.printStackTrace();
-    	}
-    	
-    }
+//    public static void sendMessageToUser(String id,String message) {
+//    	WebSocket_Doc sockettest;
+//    	try {
+//    		
+//    		sockettest = WebSocketMapUtil_Doc.get(id);
+//    		sockettest.sendMessage(message);
+//    	}
+//    	catch(Exception ee) {
+//    		System.out.println("出错啦");
+//    		ee.printStackTrace();
+//    	}
+//    	
+//    }
     
     
-    public static Session getSession() {
-    	return session;
-    }
+//    public static Session getSession() {
+//    	return session;
+//    }
     
-    public static String getSessionId() {
+    public  String getSessionId() {
     	return session.getQueryString();
     }
 }

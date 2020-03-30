@@ -1,6 +1,7 @@
 package com.im.websocket;
 
 import java.io.IOException;
+import java.sql.ResultSet;
 
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
@@ -43,20 +44,12 @@ public class MyWebSocket{
 		        sendMessageToUser(session.getQueryString(), "您当前排队位次为" + getCount());
 		        sendMessageToUser(session.getQueryString(), "当前医生在线人数：" + WebSocket_Doc.getCount() + "人");
 		        
-//		        if(WebSocketMapUtil.queue.peek() == session.getQueryString()) {
-//		        	
-//		        	sendMessageToUser(session.getQueryString(), "到你啦！");
-//		        	sendMessageToUser(session.getQueryString(), "等待医生接受邀请，请等待！");
-//		        	//sendMessageToUser(sessionDoc.getQueryString(), WebSocketMapUtil.queue.peek() + "向您发送了接诊邀请！");
-//		        	if(session.isOpen()) {
-//		        		try {
-//		        			WebSocket_Doc.sendMessageToUser(WebSocket_Doc.getSessionId(),session.getQueryString()+"向您发送了接诊邀请！");
-//		        		}
-//		        		catch(Exception eee){
-//		        			sendMessageToUser(session.getQueryString(), "当前没有医生在线，请稍后再来！");
-//		        		}
-//		        	}
-//		        }
+		        //当学生挂号成功之后，开始向所有在线的医生发通知开始更新挂号学生
+				//先获取在线医生的所有id
+		    	for(String docId : WebSocketMapUtil_Doc.webSocketMap.keySet()) {
+		    		WebSocket_Doc docWebSocket=WebSocketMapUtil_Doc.get(docId);
+		    		docWebSocket.sendMessage("updateStu");//给在线医生发送更新挂号学生的消息
+		    	}		       		      
         	}
         }
     }
