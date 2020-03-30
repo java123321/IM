@@ -44,12 +44,9 @@ public class MyWebSocket{
 		        sendMessageToUser(session.getQueryString(), "您当前排队位次为" + getCount());
 		        sendMessageToUser(session.getQueryString(), "当前医生在线人数：" + WebSocket_Doc.getCount() + "人");
 		        
-		        //当学生挂号成功之后，开始向所有在线的医生发通知开始更新挂号学生
-				//先获取在线医生的所有id
-		    	for(String docId : WebSocketMapUtil_Doc.webSocketMap.keySet()) {
-		    		WebSocket_Doc docWebSocket=WebSocketMapUtil_Doc.get(docId);
-		    		docWebSocket.sendMessage("updateStu");//给在线医生发送更新挂号学生的消息
-		    	}		       		      
+		        //给医生发通知更新挂号学生信息
+		        updateStuNumber();
+		    		       		      
         	}
         }
     }
@@ -67,14 +64,34 @@ public class MyWebSocket{
     	WebSocketMapUtil.queue.remove(id);
     	System.out.println("the remove id is "+session.getQueryString());
     	
+    	//通知其他排队挂号同学更新他们的排队位次
     	int i=1;
     	for(String stuId:WebSocketMapUtil.queue) {
     		WebSocketMapUtil.get(stuId).sendMessageToUser(stuId, "您当前排队位次为"+i);
     		i++;
     	}
+    	
+    	//给医生发通知，更新当前挂号排队学生
+    	updateStuNumber();
 
     }
      
+    //该方法用来给医生发通知更新当前挂号学生信息
+    private void updateStuNumber() {
+    	   //获取当前挂号学生数量
+		int stuNumber=WebSocketMapUtil.webSocketMap.size();
+         //当学生挂号成功之后，开始向所有在线的医生发通知开始更新挂号学生
+    	for(String docId : WebSocketMapUtil_Doc.webSocketMap.keySet()) {
+    		WebSocket_Doc docWebSocket=WebSocketMapUtil_Doc.get(docId);
+    		try {
+				docWebSocket.sendMessage("updateStu"+String.valueOf(stuNumber));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}//给在线医生发送更新挂号学生的消息
+    	}
+	}
+    
     /**
      * 收到客户端消息后调用的方法
      * @param message 客户端发送过来的消息
