@@ -11,6 +11,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class WebSocketMapUtil {
 	public static ConcurrentMap<String, MyWebSocket> webSocketMap = new ConcurrentHashMap<>();
 	public static Queue<String> queue =new LinkedBlockingQueue();
+	
+	//该方法用于将学生id和session对象保存到set和queue中
     public static void put(String key, MyWebSocket myWebSocket){
     	webSocketMap.put(key, myWebSocket);
     	queue.offer(key);

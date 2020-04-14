@@ -33,6 +33,7 @@ public class UpdateDrugInformation extends HttpServlet {
 		System.out.println("request--->"+request.getRequestURL()+"===="+request.getParameterMap().toString());
 		// 获取客户端传过来的参数
 		String name = request.getParameter("name");
+		System.out.println("thedrugname:"+name);
 		String price = request.getParameter("price");
 		String type = request.getParameter("type");
 		String describe = request.getParameter("describe");

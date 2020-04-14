@@ -41,10 +41,16 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 		array = new JSONArray();
 		a.openConnect();
 		
+		
+		
 		//获取在线学生的所有id
+		System.out.println("getonlinestu.stusize:"+WebSocketMapUtil.webSocketMap.size());
+		int i=1;
 	for(String stuId : WebSocketMapUtil.webSocketMap.keySet()) {
-		sql="select Stu_Name,Stu_Sex,Stu_Birth,Stu_Height,Stu_Weight,Stu_Icon,Stu_Phone,Stu_Address from im_stu where Stu_No="+stuId;
+		sql="select Stu_Name,Stu_Sex,Stu_Birth,Stu_Height,Stu_Weight,Stu_Icon,Stu_Phone,Stu_Address from im_stu where Stu_No='"+stuId+"'";
 		System.out.println("onlinestu"+sql);
+		System.out.println("getonlinestu.count.i:"+i);
+		i++;
 		ResultSet rs=a.getData(sql);
 		//将获取的数据集存放到json数组中
 			handleRS(rs);

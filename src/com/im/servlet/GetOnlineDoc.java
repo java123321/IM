@@ -44,7 +44,7 @@ public class GetOnlineDoc extends HttpServlet {
 		
 		//获取在线医生的所有id
 	for(String docId : WebSocketMapUtil_Doc.webSocketMap.keySet()) {
-		sql="select Doc_Name,Doc_Icon,Doc_Introduce,Doc_License,Doc_Sex from im_doc where Doc_No="+docId;
+		sql="select Doc_Name,Doc_Icon,Doc_Introduce,Doc_License,Doc_Sex from im_doc where Doc_No='"+docId+"'";
 		System.out.println("onlinedoc"+sql);
 		ResultSet rs=a.getData(sql);
 		//将获取的数据集存放到json数组中

@@ -206,13 +206,13 @@ public class GetNeedToPayOrder extends HttpServlet {
 		boolean flag=a.insertOrdrToDataBase(sql);
 		if(flag) {
 			//查询医生的删除标记为是否为true；
-		sql="select DocDelete from im_order where DrugTime="+orderId;
+		sql="select DocDelete from im_order where DrugTime='"+orderId+"'";
 		ResultSet rs=a.getData(sql);
 		try {
 			while(rs.next()) {
 				//如果医生的删除标记为也置位true，则将该订单删除
 				if(rs.getString("DocDelete").trim().equals("true")) {
-					sql="delete from im_order where DrugTime="+orderId;
+					sql="delete from im_order where DrugTime='"+orderId+"'";
 					flag=a.insertOrdrToDataBase(sql);
 					if(flag) {
 						return true;

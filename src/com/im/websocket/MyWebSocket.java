@@ -15,6 +15,7 @@ import com.im.domain.BaseBean;
 
 @ServerEndpoint(value = "/websocket")  
 public class MyWebSocket{
+	String stuId;
     //与某个客户端的连接会话，需要通过它来给客户端发送数据
     private Session session;
     BaseBean data = new BaseBean(); // 基类对象，回传给客户端的json对象
@@ -28,28 +29,34 @@ public class MyWebSocket{
     @OnOpen
     public void onOpen(Session session) throws Exception{
         this.session = session;
-        System.out.println("the id is"+session.getQueryString());
-        if(session.getQueryString().equals(WebSocketMapUtil.queue.peek())) {
-        	sendMessageToUser(session.getQueryString(), "请勿重复点击挂号！");
-        }
-        else {
-        	WebSocketMapUtil.put(session.getQueryString(),this);
+        stuId=session.getQueryString();
+        System.out.println("the id is"+stuId);
+//        	WebSocketMapUtil.put(stuId,this);
+        	//如果当前医生数量为零，则通知学生当前医生数量为零，让他稍后再来
         	if(WebSocket_Doc.getCount() == 0) {
-            	sendMessageToUser(session.getQueryString(), "当前没有医生在线，请稍后再来！");
-            	WebSocketMapUtil.remove(session.getQueryString());
-            	WebSocketMapUtil.queue.poll();
+//            	sendMessageToUser(stuId, "当前没有医生在线，请稍后再来！");
+            	sendMessage("当前没有医生在线，请稍后再来！");
+//            	WebSocketMapUtil.remove(stuId);
+//            	WebSocketMapUtil.queue.poll();
             }
-        	else {
-		        sendMessageToUser(session.getQueryString(), "挂号成功！");
-		        sendMessageToUser(session.getQueryString(), "您当前排队位次为" + getCount());
-		        sendMessageToUser(session.getQueryString(), "当前医生在线人数：" + WebSocket_Doc.getCount() + "人");
-		        
+        	else {//如果有医生在线
+        		//如果当前学生不在队列中
+        		if(!WebSocketMapUtil.webSocketMap.containsKey(stuId)) {
+        			//将学生放入队列中
+        			WebSocketMapUtil.put(stuId, this);          			
+//        			sendMessageToUser(stuId, "挂号成功！");
+//		        sendMessageToUser(stuId, "您当前排队位次为" + getCount());
+//		        sendMessageToUser(stuId, "当前医生在线人数：" + WebSocket_Doc.getCount() + "人");//		        
+		        sendMessage("挂号成功！");
+		        sendMessage("您当前排队位次为" + getCount());
+		        sendMessage("当前医生在线人数：" + WebSocket_Doc.getCount() + "人");		        		   
 		        //给医生发通知更新挂号学生信息
 		        updateStuNumber();
-		    		       		      
-        	}
-        }
+        		} 	       		      
+        	}        	
     }
+        
+    
      
     /**
      * 连接关闭调用的方法
@@ -58,11 +65,10 @@ public class MyWebSocket{
     @OnClose
     public void onClose() throws Exception{
     
-    	//将关闭的socket会话从map和queue中移除
-    	String id=session.getQueryString();
-    	WebSocketMapUtil.remove(id);
-    	WebSocketMapUtil.queue.remove(id);
-    	System.out.println("the remove id is "+session.getQueryString());
+    	//将关闭的socket会话从map和queue中移除    	
+    	WebSocketMapUtil.remove(stuId);
+    	WebSocketMapUtil.queue.remove(stuId);
+    	System.out.println("the remove id is "+stuId);
     	
     	//通知其他排队挂号同学更新他们的排队位次
     	int i=1;
@@ -80,6 +86,7 @@ public class MyWebSocket{
     private void updateStuNumber() {
     	   //获取当前挂号学生数量
 		int stuNumber=WebSocketMapUtil.webSocketMap.size();
+		System.out.println("the guahao size is:"+stuNumber);
          //当学生挂号成功之后，开始向所有在线的医生发通知开始更新挂号学生
     	for(String docId : WebSocketMapUtil_Doc.webSocketMap.keySet()) {
     		WebSocket_Doc docWebSocket=WebSocketMapUtil_Doc.get(docId);
@@ -101,21 +108,10 @@ public class MyWebSocket{
     @OnMessage
     
     public void onMessage(String message, Session session) throws IOException {
-    	String id=session.getQueryString();
-        MyWebSocket myWebSocket= ((MyWebSocket) WebSocketMapUtil.get(id));
-        if(myWebSocket != null){
-			//myWebSocket.sendMessage("挂号成功！");
-			//myWebSocket.sendMessageAll("挂号人数：" + getCount() + "人");
-        	//如果用户发送了取消，则将他从队列中拿出来
-//        	if(message.equals("cancel")) {
-//        		WebSocketMapUtil.remove(id);
-//        		myWebSocket.sendMessage("取消挂号成功");
-//        		System.out.println("the stu persion is"+getCount());
-//        	}
-//        	
+
         		String show = WebSocketMapUtil.show();
-        		myWebSocket.sendMessage(show);
-		}
+        		sendMessage(show);
+		
     }
      
     /**
@@ -126,7 +122,7 @@ public class MyWebSocket{
     @OnError
     public void onError(Session session, Throwable error){
         error.printStackTrace();
-        sendMessageToUser(session.getQueryString(), error.getMessage());
+        sendMessageToUser(stuId, error.getMessage());
     }
      
     

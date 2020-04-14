@@ -22,8 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @ServerEndpoint("/message/{userno}")
 public class Message {
-    //静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
-    private static int onlineCount = 0;
+
     //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。若要实现服务端与单一客户端通信的话，可以使用Map来存放，其中Key可以为用户标识
     private static ConcurrentHashMap<String, Message> webSocketSet = new ConcurrentHashMap<String, Message>();
     //与某个客户端的连接会话，需要通过它来给客户端发送数据
@@ -43,13 +42,13 @@ public class Message {
     @OnOpen
     public void onOpen(@PathParam(value = "userno") String param, Session WebSocketsession, EndpointConfig config) {
         userno = param;//接收到发送消息的人员编号
-        System.out.println("userno:"+userno);
+        System.out.println("chat interface userno:"+userno);
         this.WebSocketsession = WebSocketsession;
         webSocketSet.put(param, this);//加入map中
-        addOnlineCount();           //在线数加1
-        System.out.println("有新连接加入！当前在线人数为" + getOnlineCount());
+        System.out.println("Message有新连接加入！当前在线人数为" + webSocketSet.size());
+        System.out.println("chat is is :"+userno);
         try {
-			webSocketSet.get(userno).sendMessage("上线成功!");
+			sendMessage("上线成功!");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -64,11 +63,8 @@ public class Message {
     public void onClose() {
         if (!userno.equals("")) {
             webSocketSet.remove(userno);  //从set中删除
-            subOnlineCount();           //在线数减1
-            System.out.println("有一连接关闭！当前在线人数为" + getOnlineCount());
-            
-            
-            
+            System.out.println("有一连接关闭！当前在线人数为" + webSocketSet.size());
+            System.out.println("Message: closed:id:"+userno+"-----------------------------------------------------------------------------------------");
         }
     }
 
@@ -83,14 +79,10 @@ public class Message {
 //	@OnMessage
     public void onMessage(String message, Session session) {
         System.out.println("来自客户端的消息:" + message);
-//        session.get
-        //群发消息
-        if (1 > 2) {
-            sendAll(message);
-        } else {
+
             //给指定的人发消息
             sendToUser(message);
-        }
+        
     }
 
 
@@ -103,18 +95,18 @@ public class Message {
         String sendUserno = message.split("[|]")[0];
         String sendMessage = message.split("[|]")[1];
         String now = getNowTime();
+        System.out.println("message.sendmessage.aimnois:"+sendUserno);
         try {
         	Message msgObject=webSocketSet.get(sendUserno);
         	//如果要聊天的人在线，则给他发送消息
             if (msgObject != null) {
             	msgObject.sendMessage(sendMessage);          
-            	
+            	System.out.println("chat:当前用户在线");
                // webSocketSet.get(sendUserno).sendMessage(now + "用户" + userno + "发来消息：" + sendMessage);
                 //webSocketSet.get(userno).sendMessage(now + "向用户" + sendUserno + "发送消息：" + sendMessage);
-            } else {
-            	
+            } else {            	
             	webSocketSet.get(userno).sendMessage("当前用户不在线!");
-                System.out.println("当前用户不在线");
+                System.out.println("chat:当前用户不在线");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -122,26 +114,26 @@ public class Message {
     }
 
 
-    /**
-     * 给所有人发消息
-     * @param message
-     */
-    private void sendAll(String message) {
-        String now = getNowTime();
-        String sendMessage = message.split("[|]")[1];
-        //遍历HashMap
-        for (String key : webSocketSet.keySet()) {
-            try {
-                //判断接收用户是否是当前发消息的用户
-                if (!userno.equals(key)) {
-                    webSocketSet.get(key).sendMessage(now +"用户" + userno + "发来消息：" + sendMessage);
-                    System.out.println("key = " + key);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    /**
+//     * 给所有人发消息
+//     * @param message
+//     */
+//    private void sendAll(String message) {
+//        String now = getNowTime();
+//        String sendMessage = message.split("[|]")[1];
+//        //遍历HashMap
+//        for (String key : webSocketSet.keySet()) {
+//            try {
+//                //判断接收用户是否是当前发消息的用户
+//                if (!userno.equals(key)) {
+//                    webSocketSet.get(key).sendMessage(now +"用户" + userno + "发来消息：" + sendMessage);
+//                    System.out.println("key = " + key);
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
 
 
@@ -184,23 +176,5 @@ public class Message {
         this.WebSocketsession.getBasicRemote().sendText(json);
         //this.session.getAsyncRemote().sendText(message);
     }
-
-
-    public static synchronized int getOnlineCount() {
-        return onlineCount;
-    }
-
-
-    public static synchronized void addOnlineCount() {
-        Message.onlineCount++;
-    }
-
-
-    public static synchronized void subOnlineCount() {
-        Message.onlineCount--;
-    }
-
-
-
 
 }

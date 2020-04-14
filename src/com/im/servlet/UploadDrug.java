@@ -17,6 +17,8 @@ import com.im.domain.UserBean;
 
 @WebServlet("/UploadDrug")
 public class UploadDrug extends HttpServlet {
+	// 请求数据库
+			DBUtils dbUtils = new DBUtils();
 	/**
 	 * 
 	 */
@@ -57,8 +59,7 @@ public class UploadDrug extends HttpServlet {
 			attribute="false";
 		}
 		
-		// 请求数据库
-		DBUtils dbUtils = new DBUtils();
+		
 		dbUtils.openConnect();
 		// 打开数据库连接
 		BaseBean data = new BaseBean(); // 基类对象，回传给客户端的json对象
