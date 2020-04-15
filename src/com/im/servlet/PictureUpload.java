@@ -1,7 +1,7 @@
 package com.im.servlet;
 
 import java.io.*;
-
+import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -15,12 +15,10 @@ import com.im.domain.BaseBean;
 import javax.servlet.annotation.*;
 
 @WebServlet("/PictureUpload")
-@MultipartConfig(fileSizeThreshold = 1024)
+@MultipartConfig(fileSizeThreshold = 4096)
 public class PictureUpload extends HttpServlet {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+
+	DBUtils a = new DBUtils();
 
 	// 返回上传来的文件名
 	private String getFilename(Part part) {
@@ -40,41 +38,39 @@ public class PictureUpload extends HttpServlet {
 	@SuppressWarnings("null")
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html;charset=utf-8");
+		a.openConnect();
 		BaseBean data = new BaseBean(); // 基类对象，回传给客户端的json对象
 		String type = request.getParameter("type");
 		String id = request.getParameter("id");
 		String message = "";
+		String sql=null;
 		// 返回Web应用程序文档根目录
 		PrintWriter out = response.getWriter();
 		String path = this.getServletContext().getRealPath("/");
-
+		System.out.println("picture.type:"+type);
+		
 		if (type == null) {
 			message = "参数为空";
 			out.println("type==null");
-		}
-		if (type.equals("Drug")) {
-			// path = "/usr/local/tomcat/tomcat/webapps/Picture/Drug";
-			// path = "F:\\";
+		}else if (type.equals("Drug")) {//如果上传的药品图片	
 			path = path + "DrugPicture";
-		} else if (type.equals("Icon_Stu")) {
+		} else if (type.equals("Icon_Stu")) {//如果上传的学生头像
 			path = path + "StuIcon";
-			// path = "/usr/local/tomcat/tomcat/webapps/Picture/Icon/Stu";
-			// path = "F:\\";
-			type = "Icon/Stu";
+//			type = "Icon/Stu";
 			if (id == null || id.equals("")) {
 				return;
 			}
-		} else if (type.equals("Icon_Doc")) {
+		} else if (type.equals("Icon_Doc")) {//如果上传的医生头像
 			path = path + "DocIcon";
 			// path = "/usr/local/tomcat/tomcat/webapps/Picture/Icon/Doc";
-			type = "Icon/Doc";
+//			type = "Icon/Doc";
 			if (id == null || id.equals("")) {
 				return;
 			}
-		} else if (type.equals("Icon_License")) {
+		} else if (type.equals("Icon_License")) {//如果上传的医生证件
 			path = path + "DocLicenseIcon";
 			// path = "/usr/local/tomcat/tomcat/webapps/Picture/Icon/License";
-			type = "Icon/License";
+//			type = "Icon/License";
 			if (id == null || id.equals("")) {
 				return;
 			}
@@ -123,13 +119,23 @@ public class PictureUpload extends HttpServlet {
 				if (type.equals("Drug")) {
 					data.setCode(0);
 					data.setMsg("IM/DrugPicture" + "/" + fname);
-				} else if (id != null || !(id.equals(""))) {
-					// 如果是上传的学生头像
-					if (type.equals("Icon/Stu") || type == "Icon/Stu") {
-						url = "IM/StuIcon" + "/" + fname;
-						DBUtils a = new DBUtils();
-						a.openConnect();
-						String sql = "update im_stu set Stu_Icon = '" + url + "' where Stu_No = '" + id + "';";
+				} else if (type.equals("Icon_Stu")) {// 如果是上传的学生头像
+					//首先删除数据库中原有的学生头像图片					
+					sql="select Stu_Icon from im_stu where Stu_No='"+id+"'";
+					ResultSet rs=a.getData(sql);		
+						if(rs.next()) {
+							String stuIcon=rs.getString("Stu_Icon").trim().substring(10).replace("/", "\\");
+						path=path+stuIcon;
+						System.out.println("deletedrug.picture.path:"+path);
+						File file=new File(path);
+						if(file.exists()) {
+							file.delete();
+						}						
+						}
+						rs.close();
+						//将新图片文件的名字保存到数据库中						
+						url = "IM/StuIcon" + "/" + fname;					
+						sql = "update im_stu set Stu_Icon = '" + url + "' where Stu_No = '" + id + "';";
 						try {
 							a.updateDataToDB(sql);
 							data.setCode(0);
@@ -141,11 +147,23 @@ public class PictureUpload extends HttpServlet {
 							data.setMsg("更新失败！");
 						}
 					} // 如果上传的是医生的头像
-					else if (type.equals("Icon/Doc")) {
-						url = "IM/DocIcon" + "/" + fname;
-						DBUtils a = new DBUtils();
-						a.openConnect();
-						String sql = "update im_doc set Doc_Icon = '" + url + "' where Doc_No = '" + id + "';";
+					else if (type.equals("Icon_Doc")) {
+						//首先删除数据库中原有的医生头像图片					
+						sql="select Doc_Icon from im_doc where Doc_No='"+id+"'";
+						ResultSet rs=a.getData(sql);		
+							if(rs.next()) {
+								String docIcon=rs.getString("Doc_Icon").trim().substring(10).replace("/", "\\");
+							path=path+docIcon;
+							System.out.println("deletedrug.picture.path:"+path);
+							File file=new File(path);
+							if(file.exists()) {
+								file.delete();
+							}
+							}
+							rs.close();
+							//将新图片文件的名字保存到数据库中	
+						url = "IM/DocIcon" + "/" + fname;						
+						 sql = "update im_doc set Doc_Icon = '" + url + "' where Doc_No = '" + id + "';";
 						try {
 							a.updateDataToDB(sql);
 							data.setCode(0);
@@ -157,11 +175,23 @@ public class PictureUpload extends HttpServlet {
 							data.setCode(-1);
 							data.setMsg("更新失败！");
 						}
-					} else if (type.equals("Icon/License")) {// 如果上传的是医生证书
+					} else if (type.equals("Icon_License")) {// 如果上传的是医生证书
+						//首先删除数据库中原有的医生证件图片					
+						sql="select Doc_License from im_doc where Doc_No='"+id+"'";
+						ResultSet rs=a.getData(sql);		
+							if(rs.next()) {
+								String docLicense=rs.getString("Doc_License").trim().substring(17).replace("/", "\\");
+							path=path+docLicense;
+							System.out.println("deletedrug.picture.path:"+path);
+							File file=new File(path);
+							if(file.exists()) {
+								file.delete();
+							}
+							}
+							rs.close();
+							//将新图片文件的名字保存到数据库中					
 						url = "IM/DocLicenseIcon" + "/" + fname;
-						DBUtils a = new DBUtils();
-						a.openConnect();
-						String sql = "update im_doc set Doc_License = '" + url + "' where Doc_No = '" + id + "';";
+						 sql = "update im_doc set Doc_License = '" + url + "' where Doc_No = '" + id + "';";
 						try {
 							a.updateDataToDB(sql);
 							data.setCode(0);
@@ -174,11 +204,10 @@ public class PictureUpload extends HttpServlet {
 						}
 					}
 					// System.out.println("type不正确！");
-				}
+				
 			} catch (Exception ee) {
 
 			}
-
 		}
 
 		Gson gson = new Gson();
@@ -192,5 +221,8 @@ public class PictureUpload extends HttpServlet {
 		} finally {
 			response.getWriter().close(); // 关闭这个流，不然会发生错误的
 		}
+		
+		a.closeConnect();
 	}
 }
+
