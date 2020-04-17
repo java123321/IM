@@ -195,11 +195,13 @@ public class DBUtils {
 		try {
 			sta = conn.createStatement();
 			System.out.println("数据库更新成功");
-			return sta.execute(sql);
+			sta.execute(sql);
+			return true;
 		}
 		catch (SQLException e) {
 			System.out.println("数据库更新失败");
 			e.printStackTrace();
+			
 		}
 		return false;
 	}

@@ -26,7 +26,6 @@ public class GetDrugInformation extends HttpServlet{
 	String start = null;
 	String count = null;
 	String type = null;
-	String name0 = null;
 	String name = null;
 	String sum;
 	String code = "-1";
@@ -43,20 +42,17 @@ public class GetDrugInformation extends HttpServlet{
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		request.setCharacterEncoding("utf-8");
-		response.setCharacterEncoding("UTF-8");
-		response.setContentType("utf-8");
-		System.out.println("request--->"+request.getRequestURL()+"===="+request.getParameterMap().toString());
+		
+//		String sex = new String (request.getParameter("sex").getBytes("ISO-8859-1"),"UTF-8");
+		response.setContentType("text/html;charset=utf-8");
+		
 		start = request.getParameter("start"); // 获取客户端传过来的参数
 		count = request.getParameter("count");
-		type = request.getParameter("type");
-		name0 = request.getParameter("name");
-		try {
-			name = a.hexStr2Str(name0);
-		}
-		catch(Exception e1){
-			System.out.println(e1.toString());
-		}
+		type =new String(request.getParameter("type").getBytes("ISO-8859-1"),"UTF-8");
+		name =new String( request.getParameter("name").getBytes("ISO-8859-1"),"UTF-8");
+		System.out.println("getdrug.type:"+type);
+		System.out.println("getdrug.name:"+name);
+		
 		response.setContentType("text/html;charset=utf-8");
 		if (start == null || start.equals("") || count == null || count.equals("")) {
 			System.out.println("参数为空");
@@ -78,19 +74,19 @@ public class GetDrugInformation extends HttpServlet{
 		
 		String sql = null;
 		String sql2 = null;
-		if(type == null && name == null) {
+		if(type.equals("全部") && name.equals("")) {
 			sql = "select * from im_drug limit "+s+","+c+";";
 			sql2 = "select count(*) from im_drug;";
 			name = null;
 			type = null;
 		}
-		else if(type == null) {
+		else if(type.equals("全部")) {
 			sql = "select * from im_drug where Drug_Name like '"+"%"+name+"%"+"' limit "+s+","+c+";";
 			sql2 = "select count(*) from im_drug where Drug_Name like '"+"%"+name+"%"+"';";
 			name = null;
 			type = null;
 		}
-		else if(name == null) {
+		else if(name.equals("")) {
 			sql = "select * from im_drug where Drug_Type = '"+type+"' limit "+s+","+c+";";
 			sql2 = "select count(*) from im_drug where Drug_Type = '"+type+"';";
 			type = null;

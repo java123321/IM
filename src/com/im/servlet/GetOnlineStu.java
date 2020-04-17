@@ -46,7 +46,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 		//获取在线学生的所有id
 		System.out.println("getonlinestu.stusize:"+WebSocketMapUtil.webSocketMap.size());
 		int i=1;
-	for(String stuId : WebSocketMapUtil.webSocketMap.keySet()) {
+	for(String stuId : WebSocketMapUtil.queue) {
 		sql="select Stu_Name,Stu_Sex,Stu_Birth,Stu_Height,Stu_Weight,Stu_Icon,Stu_Phone,Stu_Address from im_stu where Stu_No='"+stuId+"'";
 		System.out.println("onlinestu"+sql);
 		System.out.println("getonlinestu.count.i:"+i);

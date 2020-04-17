@@ -32,6 +32,7 @@ public class WebSocketMapUtil {
     	 
 	public static void remove(String key){
 		 webSocketMap.remove(key);
+		 queue.remove(key);
 	}
 	
 	public static Collection<MyWebSocket> getValues(){

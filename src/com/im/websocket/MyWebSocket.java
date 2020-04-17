@@ -48,7 +48,7 @@ public class MyWebSocket{
 //		        sendMessageToUser(stuId, "您当前排队位次为" + getCount());
 //		        sendMessageToUser(stuId, "当前医生在线人数：" + WebSocket_Doc.getCount() + "人");//		        
 		        sendMessage("挂号成功！");
-		        sendMessage("您当前排队位次为" + getCount());
+		        sendMessage("您当前排队位次为" + WebSocketMapUtil.queue.size());
 		        sendMessage("当前医生在线人数：" + WebSocket_Doc.getCount() + "人");		        		   
 		        //给医生发通知更新挂号学生信息
 		        updateStuNumber();
@@ -67,7 +67,7 @@ public class MyWebSocket{
     
     	//将关闭的socket会话从map和queue中移除    	
     	WebSocketMapUtil.remove(stuId);
-    	WebSocketMapUtil.queue.remove(stuId);
+//    	WebSocketMapUtil.queue.remove(stuId);
     	System.out.println("the remove id is "+stuId);
     	
     	//通知其他排队挂号同学更新他们的排队位次
@@ -140,22 +140,13 @@ public class MyWebSocket{
         this.session.getBasicRemote().sendText(json);
     }
     
-    /**
-     * 群发消息方法。
-     * @param message
-     * @throws IOException
-     */
-    public void sendMessageAll(String message) throws IOException{
-    	for(MyWebSocket myWebSocket : WebSocketMapUtil.getValues()){
-    		myWebSocket.sendMessage(message);
-    	}
-    }
+
     
-    public int getCount() {
-    	
-		return WebSocketMapUtil.getValues().size();
-    	
-    }
+//    public int getCount() {
+//    	
+//		return WebSocketMapUtil.getValues().size();
+//    	
+//    }
     
     public void sendMessageToUser(String id,String message) {
     	MyWebSocket myWebSocket;

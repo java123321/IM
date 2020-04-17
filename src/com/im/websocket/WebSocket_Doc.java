@@ -76,7 +76,6 @@ public class WebSocket_Doc {
 				if (next != null) {
 					// sendMessageToUser(session.getQueryString(), next+"向您发送了接诊邀请！");
 					sendMessage(next + "向您发送了接诊邀请！");
-
 					// 准备连接数据库将医生的名字传给看病的学生
 
 					a.openConnect();
@@ -91,15 +90,8 @@ public class WebSocket_Doc {
 					sendMessage("当前没有人在挂号，请稍等！");
 					System.out.println("没有人挂号");
 				}
-			} else {
+			} 
 
-				String show = WebSocketMapUtil.show();
-				// sendMessageToUser(session.getQueryString(),
-				// "当前排队人数："+String.valueOf(my.getCount()));
-				sendMessage("当前排队人数：" + String.valueOf(my.getCount()));
-				// sendMessageToUser(session.getQueryString(), "队列："+show);
-				sendMessage("队列：" + show);
-			}
 		}
 	}
 
