@@ -48,14 +48,14 @@ public class GetNeedToPayOrder extends HttpServlet {
 		
 		case "getOrder":{//学生获取待付款订单
 			String id=request.getParameter("id");
-			 sql="select Drug_Name,Drug_Price,Drug_Index,DrugAmount,DrugTime from im_order,im_drug where im_order.DrugId=im_drug.Drug_Id and Type='notPost' and StuDelete='false' and im_order.StuId="+id+" order by DrugTime desc";
+			sql="select Drug_Name,Drug_Price,Drug_Index,DrugAmount,DrugTime from im_order,im_drug where im_order.DrugId=im_drug.Drug_Id and Type='notPost' and StuDelete='false' and im_order.StuId='"+id+"' order by DrugTime desc";
 			 handleRS(a.getData(sql));	
 			 out.println(array.toString());
 			break;
 		}
 		case "historyOrder":{//学生获取历史订单
 			String id=request.getParameter("id");
-			 sql="select Drug_Name,Drug_Price,Drug_Index,DrugAmount,DrugTime from im_order,im_drug where im_order.DrugId=im_drug.Drug_Id and Type='received' and StuDelete='false' and im_order.StuId="+id+" order by DrugTime desc";
+			 sql="select Drug_Name,Drug_Price,Drug_Index,DrugAmount,DrugTime from im_order,im_drug where im_order.DrugId=im_drug.Drug_Id and Type='received' and StuDelete='false' and im_order.StuId='"+id+"' order by DrugTime desc";
 			 handleRS(a.getData(sql));	
 			 out.println(array.toString());
 			break;			
@@ -63,7 +63,7 @@ public class GetNeedToPayOrder extends HttpServlet {
 		case "finishPay":{//学生付款款之后更新数据库
 				String id=request.getParameter("id");
 			String orderId=request.getParameter("orderId");
-			sql="update im_order set Type='finishPay' where StuId="+id+" and StuDelete='false' and DrugTime="+orderId;
+			sql="update im_order set Type='finishPay' where StuId='"+id+"' and StuDelete='false' and DrugTime='"+orderId+"'";
 			System.out.println("finish"+sql);
 			boolean flag=a.insertOrdrToDataBase(sql);		
 			if(flag) {
@@ -77,7 +77,7 @@ public class GetNeedToPayOrder extends HttpServlet {
 		case "receive":{//学生点击收货按钮进行更新操作
 			String id=request.getParameter("id");
 			String orderId=request.getParameter("orderId");
-			sql="update im_order set Type='received' where StuId="+id+" and StuDelete='false' and DrugTime="+orderId;
+			sql="update im_order set Type='received' where StuId='"+id+"' and StuDelete='false' and DrugTime='"+orderId+"'";
 			System.out.println("finish"+sql);
 			boolean flag=a.insertOrdrToDataBase(sql);		
 			if(flag) {
@@ -91,7 +91,7 @@ public class GetNeedToPayOrder extends HttpServlet {
 		}
 		case "stuNeedReceive":{//学生获取待收货订单
 			String id=request.getParameter("id");
-			 sql="select Drug_Name,Drug_Price,Drug_Index,DrugAmount,DrugTime from im_order,im_drug where im_order.DrugId=im_drug.Drug_Id and Type='havePost' and StuDelete='false' and im_order.StuId="+id+" order by DrugTime desc";
+			 sql="select Drug_Name,Drug_Price,Drug_Index,DrugAmount,DrugTime from im_order,im_drug where im_order.DrugId=im_drug.Drug_Id and Type='havePost' and StuDelete='false' and im_order.StuId='"+id+"' order by DrugTime desc";
 			 System.out.println("stuNotPost sql:"+sql);
 			 handleRS(a.getData(sql));	
 			 out.println(array.toString());
@@ -99,7 +99,7 @@ public class GetNeedToPayOrder extends HttpServlet {
 		}
 		case "stuNotPost":{//学生获取代发货订单
 			String id=request.getParameter("id");
-			 sql="select Drug_Name,Drug_Price,Drug_Index,DrugAmount,DrugTime from im_order,im_drug where im_order.DrugId=im_drug.Drug_Id and Type='finishPay' and StuDelete='false' and im_order.StuId="+id+" order by DrugTime desc";
+			 sql="select Drug_Name,Drug_Price,Drug_Index,DrugAmount,DrugTime from im_order,im_drug where im_order.DrugId=im_drug.Drug_Id and Type='finishPay' and StuDelete='false' and im_order.StuId='"+id+"' order by DrugTime desc";
 			 System.out.println("stuNotPost sql:"+sql);
 			 handleRS(a.getData(sql));	
 			 out.println(array.toString());
@@ -114,7 +114,7 @@ public class GetNeedToPayOrder extends HttpServlet {
 		}
 		case "havePost":{//医生点击已发货按钮
 			String orderId=request.getParameter("orderId");
-			sql="update im_order set Type='havePost' where DocDelete='false' and DrugTime="+orderId;
+			sql="update im_order set Type='havePost' where DocDelete='false' and DrugTime='"+orderId+"'";
 			boolean flag=a.insertOrdrToDataBase(sql);
 			if(flag) {
 				out.println("发货成功");
@@ -164,17 +164,17 @@ public class GetNeedToPayOrder extends HttpServlet {
 	//医生删除订单的方法
 	private boolean docDeleteOrder(String orderId) {
 		//首先将医生的删除订单标记为置为true
-		String sql="update im_order set DocDelete='true' where DrugTime="+orderId;
+		String sql="update im_order set DocDelete='true' where DrugTime='"+orderId+"'";
 		boolean flag=a.insertOrdrToDataBase(sql);
 		if(flag) {
 			//查询学生的删除标记为是否为true；
-		sql="select StuDelete from im_order where DrugTime="+orderId;
+		sql="select StuDelete from im_order where DrugTime='"+orderId+"'";
 		ResultSet rs=a.getData(sql);
 		try {
 			while(rs.next()) {
 				//如果学生的删除标记为也置位true，则将该订单删除
 				if(rs.getString("StuDelete").trim().equals("true")) {
-					sql="delete from im_order where DrugTime="+orderId;
+					sql="delete from im_order where DrugTime='"+orderId+"'";
 					flag=a.insertOrdrToDataBase(sql);
 					if(flag) {
 						return true;
@@ -201,7 +201,7 @@ public class GetNeedToPayOrder extends HttpServlet {
 	//学生删除订单的方法
 	private boolean stuDeleteOrder(String orderId) {
 		//首先将医生的删除订单标记为置为true
-		String sql="update im_order set StuDelete='true' where DrugTime="+orderId;
+		String sql="update im_order set StuDelete='true' where DrugTime='"+orderId+"'";
 		System.out.println("stusql"+sql);
 		boolean flag=a.insertOrdrToDataBase(sql);
 		if(flag) {

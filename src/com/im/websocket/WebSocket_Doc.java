@@ -69,9 +69,8 @@ public class WebSocket_Doc {
 			MyWebSocket my = new MyWebSocket();
 			// 当医生发送next准备接诊学生时
 			if (message.equals("next")) {
-//				WebSocketMapUtil.remove(session.getQueryString());
-//		    	WebSocketMapUtil.queue.poll();
-				String next = null;
+				synchronized (WebSocket_Doc.class) {
+						String next = null;
 				next = WebSocketMapUtil.queue.poll();
 				if (next != null) {
 					// sendMessageToUser(session.getQueryString(), next+"向您发送了接诊邀请！");
@@ -90,6 +89,7 @@ public class WebSocket_Doc {
 					sendMessage("当前没有人在挂号，请稍等！");
 					System.out.println("没有人挂号");
 				}
+				}	
 			} 
 
 		}
