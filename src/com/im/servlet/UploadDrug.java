@@ -17,12 +17,7 @@ import com.im.domain.UserBean;
 
 @WebServlet("/UploadDrug")
 public class UploadDrug extends HttpServlet {
-	// 请求数据库
-	DBUtils dbUtils = new DBUtils();
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -33,8 +28,9 @@ public class UploadDrug extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		// 请求数据库
+		DBUtils dbUtils = new DBUtils();
 		response.setContentType("text/html;charset=utf-8");
-
 		dbUtils.openConnect();
 		PrintWriter out = response.getWriter();
 		// 获取客户端传过来的参数

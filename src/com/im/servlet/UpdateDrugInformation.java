@@ -19,9 +19,7 @@ import com.im.domain.UserBean;
 
 @WebServlet("/UpdateDrugInformation")
 public class UpdateDrugInformation extends HttpServlet {
-	DBUtils dbUtils = new DBUtils();
-	private static final long serialVersionUID = 1L;
-	String sql;
+	
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -32,6 +30,9 @@ public class UpdateDrugInformation extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		DBUtils dbUtils = new DBUtils();
+		String sql;
+		
 		response.setContentType("text/html;charset=utf-8");
 		dbUtils.openConnect();
 		PrintWriter out = response.getWriter();

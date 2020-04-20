@@ -24,16 +24,13 @@ import com.mysql.cj.jdbc.result.ResultSetMetaData;
  */
 @WebServlet("/GetNeedToPayOrder")
 public class GetNeedToPayOrder extends HttpServlet {
-	 private DecimalFormat df = new DecimalFormat("##0.00");
-	private DBUtils a = new DBUtils();
-	private static final long serialVersionUID = 1L;
-	private JSONArray array;
-    public GetNeedToPayOrder() {
-        super();
-    }
-
+	 
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		 DBUtils a = new DBUtils();
+		 JSONArray array;
+		DecimalFormat df = new DecimalFormat("##0.00");
+		
 		request.setCharacterEncoding("utf-8");
 		response.setCharacterEncoding("UTF-8");	
 		response.setContentType("text/html;charset=utf-8");
@@ -49,14 +46,14 @@ public class GetNeedToPayOrder extends HttpServlet {
 		case "getOrder":{//学生获取待付款订单
 			String id=request.getParameter("id");
 			sql="select Drug_Name,Drug_Price,Drug_Index,DrugAmount,DrugTime from im_order,im_drug where im_order.DrugId=im_drug.Drug_Id and Type='notPost' and StuDelete='false' and im_order.StuId='"+id+"' order by DrugTime desc";
-			 handleRS(a.getData(sql));	
+			 handleRS(a.getData(sql),array,df);	
 			 out.println(array.toString());
 			break;
 		}
 		case "historyOrder":{//学生获取历史订单
 			String id=request.getParameter("id");
 			 sql="select Drug_Name,Drug_Price,Drug_Index,DrugAmount,DrugTime from im_order,im_drug where im_order.DrugId=im_drug.Drug_Id and Type='received' and StuDelete='false' and im_order.StuId='"+id+"' order by DrugTime desc";
-			 handleRS(a.getData(sql));	
+			 handleRS(a.getData(sql),array,df);	
 			 out.println(array.toString());
 			break;			
 		}
@@ -93,7 +90,7 @@ public class GetNeedToPayOrder extends HttpServlet {
 			String id=request.getParameter("id");
 			 sql="select Drug_Name,Drug_Price,Drug_Index,DrugAmount,DrugTime from im_order,im_drug where im_order.DrugId=im_drug.Drug_Id and Type='havePost' and StuDelete='false' and im_order.StuId='"+id+"' order by DrugTime desc";
 			 System.out.println("stuNotPost sql:"+sql);
-			 handleRS(a.getData(sql));	
+			 handleRS(a.getData(sql),array,df);	
 			 out.println(array.toString());
 			break;
 		}
@@ -101,14 +98,14 @@ public class GetNeedToPayOrder extends HttpServlet {
 			String id=request.getParameter("id");
 			 sql="select Drug_Name,Drug_Price,Drug_Index,DrugAmount,DrugTime from im_order,im_drug where im_order.DrugId=im_drug.Drug_Id and Type='finishPay' and StuDelete='false' and im_order.StuId='"+id+"' order by DrugTime desc";
 			 System.out.println("stuNotPost sql:"+sql);
-			 handleRS(a.getData(sql));	
+			 handleRS(a.getData(sql),array,df);	
 			 out.println(array.toString());
 			break;
 		}
 		case "notPost":{//医生查看待发货的订单
 			 sql="select Stu_Name,Stu_Phone,Stu_Address,Drug_Name,DrugAmount,Drug_Index,Drug_Price,DrugTime from im_order,im_drug,im_stu where im_order.DrugId=im_drug.Drug_Id and im_order.StuId=im_stu.Stu_No and Type='finishPay' and DocDelete='false' order by DrugTime asc";
 			
-			 handleNotPostRS(a.getData(sql));
+			 handleNotPostRS(a.getData(sql),array);
 			 out.println(array.toString());
 			break;
 		}
@@ -126,7 +123,7 @@ public class GetNeedToPayOrder extends HttpServlet {
 		}
 		case "delete":{//医生点击删除订单按钮
 			String orderId=request.getParameter("orderId");		
-			boolean flag=docDeleteOrder(orderId);
+			boolean flag=docDeleteOrder(orderId,a);
 			if(flag) {
 				out.println("删除成功");
 			}
@@ -137,7 +134,7 @@ public class GetNeedToPayOrder extends HttpServlet {
 		}
 		case "stuDelete":{//学生删除历史订单		
 			String orderId=request.getParameter("orderId");
-			boolean flag=stuDeleteOrder(orderId);
+			boolean flag=stuDeleteOrder(orderId,a);
 			if(flag) {
 				out.println("删除成功");
 			}
@@ -149,7 +146,7 @@ public class GetNeedToPayOrder extends HttpServlet {
 		}
 		case "getHavePost":{//获取医生已发货的订单
 			 sql="select Stu_Name,Stu_Phone,Stu_Address,Drug_Name,DrugAmount,Drug_Index,Drug_Price,DrugTime from im_order,im_drug,im_stu where im_order.DrugId=im_drug.Drug_Id and im_order.StuId=im_stu.Stu_No and Type='havePost' and DocDelete='false' order by DrugTime asc";
-			 handleNotPostRS(a.getData(sql));
+			 handleNotPostRS(a.getData(sql),array);
 			 out.println(array.toString());
 			break;
 		}					
@@ -162,7 +159,7 @@ public class GetNeedToPayOrder extends HttpServlet {
 	}
 	
 	//医生删除订单的方法
-	private boolean docDeleteOrder(String orderId) {
+	private boolean docDeleteOrder(String orderId, DBUtils a) {
 		//首先将医生的删除订单标记为置为true
 		String sql="update im_order set DocDelete='true' where DrugTime='"+orderId+"'";
 		boolean flag=a.insertOrdrToDataBase(sql);
@@ -199,7 +196,7 @@ public class GetNeedToPayOrder extends HttpServlet {
 	}
 	
 	//学生删除订单的方法
-	private boolean stuDeleteOrder(String orderId) {
+	private boolean stuDeleteOrder(String orderId,DBUtils a) {
 		//首先将医生的删除订单标记为置为true
 		String sql="update im_order set StuDelete='true' where DrugTime='"+orderId+"'";
 		System.out.println("stusql"+sql);
@@ -236,7 +233,7 @@ public class GetNeedToPayOrder extends HttpServlet {
 		return false;
 	}
 	
-	private void handleNotPostRS(ResultSet rs) {		   
+	private void handleNotPostRS(ResultSet rs,JSONArray array) {		   
 		   JSONObject orderInfo=new JSONObject();
 			String time=null;
 			String newTime=null;
@@ -270,7 +267,7 @@ public class GetNeedToPayOrder extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
-	private void handleRS(ResultSet rs) {
+	private void handleRS(ResultSet rs,JSONArray array,DecimalFormat df ) {
 		System.out.println("result0:"+array.toString());
 	    ResultSetMetaData metaData;
 		try {

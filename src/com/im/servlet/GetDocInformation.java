@@ -19,13 +19,10 @@ import com.im.domain.BaseBean;
 
 @WebServlet("/GetDocInformation")
 public class GetDocInformation extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-    		DBUtils a = new DBUtils();
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-		ResultSet rs = null;
-		
+		DBUtils a = new DBUtils();
+		ResultSet rs = null;	
 		System.out.println("request--->"+request.getRequestURL()+"===="+request.getParameterMap().toString());
 		String no = request.getParameter("no");
 		String state = request.getParameter("state");

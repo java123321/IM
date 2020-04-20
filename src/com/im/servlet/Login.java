@@ -13,15 +13,7 @@ import com.im.domain.BaseBean;
 import com.im.domain.UserBean;
 
 public class Login extends HttpServlet{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	DBUtils a = new DBUtils();
-	String no;
-	String pwd;
-	BaseBean data = new BaseBean(); // 基类对象，回传给客户端的json对象
-	UserBean userBean = new UserBean(); // user的对象
+
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException {
@@ -30,7 +22,13 @@ public class Login extends HttpServlet{
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		System.out.println("request--->"+request.getRequestURL()+"===="+request.getParameterMap().toString());
+
+		DBUtils a = new DBUtils();
+		String no;
+		String pwd;
+		BaseBean data = new BaseBean(); // 基类对象，回传给客户端的json对象
+		UserBean userBean = new UserBean(); // user的对象
+		
 		no = request.getParameter("no"); // 获取客户端传过来的参数
 		pwd = request.getParameter("pwd");
 		response.setContentType("text/html;charset=utf-8");

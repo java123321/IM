@@ -23,21 +23,17 @@ import com.mysql.cj.jdbc.result.ResultSetMetaData;
  */
 @WebServlet("/GetOnlineDoc")
 public class GetOnlineDoc extends HttpServlet {
-	private JSONArray array;
-	private DBUtils a = new DBUtils();
-	private String sql;
-	private static final long serialVersionUID = 1L;
-    public GetOnlineDoc() {
-        super();
-    }
-    
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
     
     //获取当前在线医生的信息
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {	
+		JSONArray array;
+		DBUtils a = new DBUtils();
+		String sql;
 		response.setContentType("text/html;charset=utf-8");
 		array = new JSONArray();
 		a.openConnect();
@@ -48,10 +44,10 @@ public class GetOnlineDoc extends HttpServlet {
 		System.out.println("onlinedoc"+sql);
 		ResultSet rs=a.getData(sql);
 		//将获取的数据集存放到json数组中
-			handleRS(rs);
+			handleRS(rs,array);
 	}
 	
-	System.out.println("thedocsize"+ WebSocketMapUtil_Doc.webSocketMap.size());
+	System.out.println("get.online.doc.size:"+ WebSocketMapUtil_Doc.webSocketMap.size());
 	if(array.length()==0) {
 		JSONObject jsonObj = new JSONObject();
 		try {
@@ -78,7 +74,7 @@ public class GetOnlineDoc extends HttpServlet {
 	}
 	
 	//将获取的数据集存放到json数组中
-	private void handleRS(ResultSet rs) {
+	private void handleRS(ResultSet rs,JSONArray array) {
 		  // 获取列数
 	       try {
 	       ResultSetMetaData metaData = (ResultSetMetaData) rs.getMetaData();

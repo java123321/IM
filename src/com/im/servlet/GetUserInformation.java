@@ -19,18 +19,7 @@ import com.im.domain.BaseBean;
 
 @WebServlet(name="GetUserInformation",urlPatterns = {"/GetUserInformation"})
 public class GetUserInformation extends HttpServlet {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	ResultSet rs;
-	DBUtils a = new DBUtils();
-	String code = "500";
-	String msg = "未初始化！";
-	String info;
-	
-	
+
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException {
@@ -41,6 +30,13 @@ public class GetUserInformation extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		ResultSet rs = null;
+		DBUtils a = new DBUtils();
+		String code = "500";
+		String msg = "未初始化！";
+		String info = null;
+		
+		
 		System.out.println("request--->"+request.getRequestURL()+"===="+request.getParameterMap().toString());
 		String name = request.getParameter("name");
 		String type = request.getParameter("type");

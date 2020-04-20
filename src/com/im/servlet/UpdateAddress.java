@@ -15,13 +15,9 @@ import com.im.domain.BaseBean;
 
 @WebServlet("/UpdateAddress")
 public class UpdateAddress extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-    
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		DBUtils a = new DBUtils();
-
-		
+		DBUtils a = new DBUtils();		
 		System.out.println("request--->"+request.getRequestURL()+"===="+request.getParameterMap().toString());
 		String name = request.getParameter("name");
 		String address = request.getParameter("address");

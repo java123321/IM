@@ -18,8 +18,7 @@ import javax.servlet.annotation.*;
 @MultipartConfig(fileSizeThreshold = 4096)
 public class PictureUpload extends HttpServlet {
 
-	DBUtils a = new DBUtils();
-
+	
 	// 返回上传来的文件名
 	private String getFilename(Part part) {
 		String fname = null;
@@ -38,6 +37,8 @@ public class PictureUpload extends HttpServlet {
 	@SuppressWarnings("null")
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html;charset=utf-8");
+		DBUtils a = new DBUtils();
+
 		a.openConnect();
 		BaseBean data = new BaseBean(); // 基类对象，回传给客户端的json对象
 		String type = request.getParameter("type");

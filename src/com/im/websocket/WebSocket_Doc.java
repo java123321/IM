@@ -71,7 +71,7 @@ public class WebSocket_Doc {
 			if (message.equals("next")) {
 				synchronized (WebSocket_Doc.class) {
 						String next = null;
-				next = WebSocketMapUtil.queue.poll();
+				next = WebSocketMapUtil.queue.peek();
 				if (next != null) {
 					// sendMessageToUser(session.getQueryString(), next+"向您发送了接诊邀请！");
 					sendMessage(next + "向您发送了接诊邀请！");

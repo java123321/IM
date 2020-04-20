@@ -23,18 +23,13 @@ import com.im.db.DBUtils;
  */
 @WebServlet("/UploadOrder")
 public class UploadOrder extends HttpServlet {
-	private boolean flag = true;
-	private DBUtils a = new DBUtils();
-	private static final long serialVersionUID = 1L;
-	private String sql;
-
-	public UploadOrder() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+	
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		 boolean flag = true;
+		 DBUtils a = new DBUtils();
+		 String sql;
 		response.setContentType("text/html;charset=utf-8");
 		request.setCharacterEncoding("utf-8");
 		response.setCharacterEncoding("utf-8");

@@ -18,22 +18,6 @@ import com.im.domain.BaseBean;
 import com.im.domain.UserBean;
 @WebServlet(name="GetDrugInformation",urlPatterns = {"/GetDrugInformation"})
 public class GetDrugInformation extends HttpServlet{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	DBUtils a = new DBUtils();
-	String start = null;
-	String count = null;
-	String type = null;
-	String name = null;
-	String sum;
-	String code = "-1";
-	String msg = "错误！！";;
-	BaseBean data = new BaseBean(); // 基类对象，回传给客户端的json对象
-	UserBean userBean = new UserBean(); // user的对象
-	ResultSet rs;
-	ResultSet rs2;
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException {
@@ -42,6 +26,20 @@ public class GetDrugInformation extends HttpServlet{
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		DBUtils a = new DBUtils();
+		String start = null;
+		String count = null;
+		String type = null;
+		String name = null;
+		String sum=null;
+		String code = "-1";
+		String msg = "错误！！";;
+		BaseBean data = new BaseBean(); // 基类对象，回传给客户端的json对象
+		UserBean userBean = new UserBean(); // user的对象
+		ResultSet rs;
+		ResultSet rs2;
+		
+		
 		
 //		String sex = new String (request.getParameter("sex").getBytes("ISO-8859-1"),"UTF-8");
 		response.setContentType("text/html;charset=utf-8");

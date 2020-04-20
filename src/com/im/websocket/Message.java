@@ -46,7 +46,7 @@ public class Message {
         this.WebSocketsession = WebSocketsession;
         webSocketSet.put(param, this);//加入map中
         System.out.println("Message有新连接加入！当前在线人数为" + webSocketSet.size());
-        System.out.println("chat is is :"+userno);
+        System.out.println("message.open.id:"+userno);
         try {
 			sendMessage("上线成功!");
 		} catch (IOException e) {
@@ -64,7 +64,7 @@ public class Message {
         if (!userno.equals("")) {
             webSocketSet.remove(userno);  //从set中删除
             System.out.println("有一连接关闭！当前在线人数为" + webSocketSet.size());
-            System.out.println("Message: closed:id:"+userno+"-----------------------------------------------------------------------------------------");
+            System.out.println("Message.closed.id:"+userno+"-----------------------------------------------------------------------------------------");
         }
     }
 
@@ -78,8 +78,7 @@ public class Message {
     @SuppressWarnings("unused")
 //	@OnMessage
     public void onMessage(String message, Session session) {
-        System.out.println("来自客户端的消息:" + message);
-
+        System.out.println("message.from.client:" + message);
             //给指定的人发消息
             sendToUser(message);
         
@@ -114,30 +113,6 @@ public class Message {
     }
 
 
-//    /**
-//     * 给所有人发消息
-//     * @param message
-//     */
-//    private void sendAll(String message) {
-//        String now = getNowTime();
-//        String sendMessage = message.split("[|]")[1];
-//        //遍历HashMap
-//        for (String key : webSocketSet.keySet()) {
-//            try {
-//                //判断接收用户是否是当前发消息的用户
-//                if (!userno.equals(key)) {
-//                    webSocketSet.get(key).sendMessage(now +"用户" + userno + "发来消息：" + sendMessage);
-//                    System.out.println("key = " + key);
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
-
-
-
     /**
      * 获取当前时间
      *
@@ -157,7 +132,7 @@ public class Message {
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        System.out.println("发生错误");
+        System.out.println("message.occure.error.id"+userno);
         error.printStackTrace();
     }
 

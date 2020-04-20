@@ -23,39 +23,34 @@ import com.mysql.cj.jdbc.result.ResultSetMetaData;
  */
 @WebServlet("/GetOnlineStu")
 public class GetOnlineStu extends HttpServlet {
-	private String sql;
-	private JSONArray array;
-	private static final long serialVersionUID = 1L;
-	private DBUtils a = new DBUtils();
-    public GetOnlineStu() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
+
 protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
 	}
-
-
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		int i=1;
+		String sql;
+		JSONArray array;
+		DBUtils a = new DBUtils();
 		response.setContentType("text/html;charset=utf-8");
 		array = new JSONArray();
+		System.out.println("start.array.value:"+array.toString());
+		System.out.println("start.i.value:"+i);
+		i++;
 		a.openConnect();
-		
-		
-		
 		//获取在线学生的所有id
-		System.out.println("getonlinestu.stusize:"+WebSocketMapUtil.webSocketMap.size());
-		int i=1;
+		System.out.println("getonlinestu.stusize:"+WebSocketMapUtil.queue.size());
+		
 	for(String stuId : WebSocketMapUtil.queue) {
 		sql="select Stu_Name,Stu_Sex,Stu_Birth,Stu_Height,Stu_Weight,Stu_Icon,Stu_Phone,Stu_Address from im_stu where Stu_No='"+stuId+"'";
 		System.out.println("onlinestu"+sql);
 		System.out.println("getonlinestu.count.i:"+i);
-		i++;
+		
 		ResultSet rs=a.getData(sql);
 		//将获取的数据集存放到json数组中
-			handleRS(rs);
+			handleRS(rs,array);
 	}
-	System.out.println("thestusize"+ WebSocketMapUtil.webSocketMap.size());
+	System.out.println("thestusize"+ WebSocketMapUtil.queue.size());
 	if(array.length()==0) {
 		JSONObject jsonObj = new JSONObject();
 		try {
@@ -81,12 +76,13 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 	}
 	
 	//将获取的数据集存放到json数组中
-	private void handleRS(ResultSet rs) {
+	private void handleRS(ResultSet rs,JSONArray array) {
 		  // 获取列数
 	       try {
 	       ResultSetMetaData metaData = (ResultSetMetaData) rs.getMetaData();
 	       int columnCount = metaData.getColumnCount();
-	      
+	      System.out.println("get.online.stu.before.handle.rs:"+array.toString());
+
 	       // 遍历ResultSet中的每条数据     
 	        while (rs.next()) {
 	        	JSONObject jsonObj = new JSONObject();
