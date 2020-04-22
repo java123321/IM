@@ -64,15 +64,20 @@ public class WebSocket_Doc {
 
 	public void onMessage(String message, Session session) throws IOException {
 
-		WebSocket_Doc sockettest = ((WebSocket_Doc) WebSocketMapUtil_Doc.get(docId));
+		System.out.println("docwebsocket.message.content:"+message);
+		if(message.equals("heartBeat")){//如果客户端发送的心跳检测包，则给予回复
+			sendMessage("heartBeat");
+		}else {
+			WebSocket_Doc sockettest = ((WebSocket_Doc) WebSocketMapUtil_Doc.get(docId));
 		if (sockettest != null) {
 			MyWebSocket my = new MyWebSocket();
 			// 当医生发送next准备接诊学生时
 			if (message.equals("next")) {
 				synchronized (WebSocket_Doc.class) {
 						String next = null;
-				next = WebSocketMapUtil.queue.peek();
-				if (next != null) {
+						//首先给队首的学生发送接诊消息
+				next = WebSocketMapUtil.queue.poll();
+				if (next != null) {//如果队首有学生挂号
 					// sendMessageToUser(session.getQueryString(), next+"向您发送了接诊邀请！");
 					sendMessage(next + "向您发送了接诊邀请！");
 					// 准备连接数据库将医生的名字传给看病的学生
@@ -83,7 +88,8 @@ public class WebSocket_Doc {
 
 					my.sendMessageToUser(next, "到你啦！医生id为" + docId + "医生姓名为" + docData[0] + "医生头像为" + docData[1]);
 					my.sendMessageToUser(next, "等待医生接受邀请，请等待！");
-					next = null;
+					//给队首的学生发送完消息之后，将学生对象从map中移除
+					WebSocketMapUtil.webSocketMap.remove(next);					
 				} else {
 					// sendMessageToUser(session.getQueryString(), "当前没有人在挂号，请稍等！");
 					sendMessage("当前没有人在挂号，请稍等！");
@@ -93,7 +99,15 @@ public class WebSocket_Doc {
 			} 
 
 		}
+		}
+		
+		
+		
+		
+		
 	}
+	
+
 
 	/**
 	 * 发生错误时调用
@@ -104,6 +118,8 @@ public class WebSocket_Doc {
 	@OnError
 	public void onError(Session session, Throwable error) {
 		error.printStackTrace();
+		
+		System.out.println("docwebsocket.error.id:" + docId);
 		// sendMessageToUser(session.getQueryString(), "Doc: "+error.getMessage());
 		try {
 			sendMessage("Doc:    " + error.getMessage());
@@ -129,17 +145,17 @@ public class WebSocket_Doc {
 		this.session.getBasicRemote().sendText(json);
 	}
 
-	/**
-	 * 群发消息方法。
-	 * 
-	 * @param message
-	 * @throws IOException
-	 */
-	public static void sendMessageAll(String message) throws IOException {
-		for (WebSocket_Doc sockettest : WebSocketMapUtil_Doc.getValues()) {
-			sockettest.sendMessage(message);
-		}
-	}
+//	/**
+//	 * 群发消息方法。
+//	 * 
+//	 * @param message
+//	 * @throws IOException
+//	 */
+//	public static void sendMessageAll(String message) throws IOException {
+//		for (WebSocket_Doc sockettest : WebSocketMapUtil_Doc.getValues()) {
+//			sockettest.sendMessage(message);
+//		}
+//	}
 
 	public static int getCount() {
 

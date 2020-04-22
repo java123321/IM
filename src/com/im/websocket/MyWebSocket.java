@@ -31,13 +31,9 @@ public class MyWebSocket{
         this.session = session;
         stuId=session.getQueryString();
         System.out.println("the id is"+stuId);
-//        	WebSocketMapUtil.put(stuId,this);
         	//如果当前医生数量为零，则通知学生当前医生数量为零，让他稍后再来
         	if(WebSocket_Doc.getCount() == 0) {
-//            	sendMessageToUser(stuId, "当前没有医生在线，请稍后再来！");
             	sendMessage("当前没有医生在线，请稍后再来！");
-//            	WebSocketMapUtil.remove(stuId);
-//            	WebSocketMapUtil.queue.poll();
             }
         	else {//如果有医生在线
         		//如果当前学生不在队列中
@@ -70,17 +66,22 @@ public class MyWebSocket{
 //    	WebSocketMapUtil.queue.remove(stuId);
     	System.out.println("the remove id is "+stuId);
     	
-    	//通知其他排队挂号同学更新他们的排队位次
+    	//当学生被接诊或者取消挂号之后，更新剩余学生位次
+    	updateStuRank();
+    	System.out.println("mywebsocket.close.updateStuRank");
+    	//给医生发通知，更新当前挂号排队学生
+    	updateStuNumber();
+
+    }
+    private void updateStuRank() {
     	int i=1;
     	for(String stuId:WebSocketMapUtil.queue) {
     		WebSocketMapUtil.get(stuId).sendMessageToUser(stuId, "您当前排队位次为"+i);
     		i++;
     	}
-    	
-    	//给医生发通知，更新当前挂号排队学生
-    	updateStuNumber();
-
     }
+
+    
      
     //该方法用来给医生发通知更新当前挂号学生信息
     private void updateStuNumber() {
@@ -108,10 +109,7 @@ public class MyWebSocket{
     @OnMessage
     
     public void onMessage(String message, Session session) throws IOException {
-
-        		String show = WebSocketMapUtil.show();
-        		sendMessage(show);
-		
+    	sendMessage(message);		
     }
      
     /**

@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @ServerEndpoint("/message/{userno}")
 public class Message {
-
+	private int i=0;
     //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。若要实现服务端与单一客户端通信的话，可以使用Map来存放，其中Key可以为用户标识
     private static ConcurrentHashMap<String, Message> webSocketSet = new ConcurrentHashMap<String, Message>();
     //与某个客户端的连接会话，需要通过它来给客户端发送数据
@@ -41,18 +41,17 @@ public class Message {
      */
     @OnOpen
     public void onOpen(@PathParam(value = "userno") String param, Session WebSocketsession, EndpointConfig config) {
+    	System.out.println("message.open.i:"+i);
+    	i++;
         userno = param;//接收到发送消息的人员编号
         System.out.println("chat interface userno:"+userno);
         this.WebSocketsession = WebSocketsession;
         webSocketSet.put(param, this);//加入map中
         System.out.println("Message有新连接加入！当前在线人数为" + webSocketSet.size());
         System.out.println("message.open.id:"+userno);
-        try {
+     
 			sendMessage("上线成功!");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	
     }
 
 
@@ -62,7 +61,7 @@ public class Message {
     @OnClose
     public void onClose() {
         if (!userno.equals("")) {
-            webSocketSet.remove(userno);  //从set中删除
+//            webSocketSet.remove(userno);  //从set中删除
             System.out.println("有一连接关闭！当前在线人数为" + webSocketSet.size());
             System.out.println("Message.closed.id:"+userno+"-----------------------------------------------------------------------------------------");
         }
@@ -75,12 +74,20 @@ public class Message {
      * @param message 客户端发送过来的消息
      * @param session 可选的参数
      */
-    @SuppressWarnings("unused")
-//	@OnMessage
+//    @SuppressWarnings("unused")
+	@OnMessage
     public void onMessage(String message, Session session) {
-        System.out.println("message.from.client:" + message);
+    		
+    	System.out.println("message.content:"+message);
+    	if(message.equals("heartBeat")){//如果客户端发送的心跳检测包，则给予回复
+			sendMessage("heartBeat");
+    	}else {
+			
+    		System.out.println("message.sendToUser");
             //给指定的人发消息
             sendToUser(message);
+		}
+    	
         
     }
 
@@ -89,27 +96,27 @@ public class Message {
      * 给指定的人发送消息
      * @param message
      */
-    @OnMessage
+//    @OnMessage
     public void sendToUser(String message) {
+    	System.out.println("message.sendToUser.content:"+message);
         String sendUserno = message.split("[|]")[0];
         String sendMessage = message.split("[|]")[1];
         String now = getNowTime();
-        System.out.println("message.sendmessage.aimnois:"+sendUserno);
-        try {
+        System.out.println("message.sendmessage.send.id:"+userno);
+        System.out.println("message.sendmessage.receive.id:"+sendUserno);
+        System.out.println("message.sendmessage.send.content:"+sendMessage);
+        
         	Message msgObject=webSocketSet.get(sendUserno);
         	//如果要聊天的人在线，则给他发送消息
             if (msgObject != null) {
             	msgObject.sendMessage(sendMessage);          
             	System.out.println("chat:当前用户在线");
-               // webSocketSet.get(sendUserno).sendMessage(now + "用户" + userno + "发来消息：" + sendMessage);
-                //webSocketSet.get(userno).sendMessage(now + "向用户" + sendUserno + "发送消息：" + sendMessage);
+              
             } else {            	
             	webSocketSet.get(userno).sendMessage("当前用户不在线!");
                 System.out.println("chat:当前用户不在线");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+     
     }
 
 
@@ -143,12 +150,16 @@ public class Message {
      * @param message
      * @throws IOException
      */
-    public void sendMessage(String message) throws IOException {
+    public void sendMessage(String message) {
     	data.setCode(0);
-		data.setMsg(message);
-    	
+		data.setMsg(message);    	
 		json = gson.toJson(data);
-        this.WebSocketsession.getBasicRemote().sendText(json);
+        try {
+			this.WebSocketsession.getBasicRemote().sendText(json);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         //this.session.getAsyncRemote().sendText(message);
     }
 

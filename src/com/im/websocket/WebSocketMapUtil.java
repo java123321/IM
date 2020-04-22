@@ -18,13 +18,13 @@ public class WebSocketMapUtil {
     	queue.offer(key);
     }
     	
-    public static String show() {
-    	String str = "";
-		for(String key : webSocketMap.keySet()) {
-			str = str + key + "---";
-		}
-		return str;
-    }
+//    public static String show() {
+//    	String str = "";
+//		for(String key : webSocketMap.keySet()) {
+//			str = str + key + "---";
+//		}
+//		return str;
+//    }
  
     public static MyWebSocket get(String key){
     	 return webSocketMap.get(key);
