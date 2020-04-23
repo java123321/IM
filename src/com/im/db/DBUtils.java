@@ -209,8 +209,8 @@ public class DBUtils {
 	
 	
 	
-	public boolean updateDataToDB_Adress(String name, String address, String phone) {
-		String sql = "update im_stu set Stu_Address = '"+address+"',Stu_Phone = '"+phone+"' where Stu_No = '"+name+"';";
+	public boolean updateDataToDB_Adress(String name, String address, String phone,String stuId) {
+		String sql = "update im_stu set Stu_Address = '"+address+"',Stu_Phone = '"+phone+"',Stu_Name='"+name+"' where Stu_No = '"+stuId+"';";
 		System.out.println(sql);
 		try {
 			sta = conn.createStatement();

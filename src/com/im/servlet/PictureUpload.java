@@ -107,7 +107,7 @@ public class PictureUpload extends HttpServlet {
 				String pa = path + "/" + fname;
 				System.out.println("the pa is first" + pa);
 				p.write(pa); // 将上传的文件写入磁盘
-				System.out.println("the pa is " + pa);
+				System.out.println("he pa ist " + pa);
 			} catch (Exception ee) {
 				out.println("Exception:" + ee.toString());
 			}
@@ -123,8 +123,16 @@ public class PictureUpload extends HttpServlet {
 				} else if (type.equals("Icon_Stu")) {// 如果是上传的学生头像
 					//首先删除数据库中原有的学生头像图片					
 					sql="select Stu_Icon from im_stu where Stu_No='"+id+"'";
-					ResultSet rs=a.getData(sql);		
-						if(rs.next()) {
+					ResultSet rs=a.getData(sql);	
+					System.out.println("picture.upload.stuicon.before");
+//					System.out.println("boolean:"+rs.next());
+					System.out.println("boolean.null:"+rs==null);
+					System.out.println("picture.upload.stuicon.before1");
+					System.out.println("boolean:"+rs.next());
+					System.out.println("picture.upload.stuicon.before2");
+					rs.previous();
+					System.out.println("picture.upload.stuicon.before3");
+						if(rs.next()&&(rs.getString("Stu_Icon")!=null)) {//如果原来没有									
 							String stuIcon=rs.getString("Stu_Icon").trim().substring(10).replace("/", "\\");
 						path=path+stuIcon;
 						System.out.println("deletedrug.picture.path:"+path);
@@ -133,10 +141,13 @@ public class PictureUpload extends HttpServlet {
 							file.delete();
 						}						
 						}
+							System.out.println("picture.upload.stuicon.later");
 						rs.close();
+					
 						//将新图片文件的名字保存到数据库中						
 						url = "IM/StuIcon" + "/" + fname;					
 						sql = "update im_stu set Stu_Icon = '" + url + "' where Stu_No = '" + id + "';";
+						System.out.println("picture.upload.stuicon:"+sql);
 						try {
 							a.updateDataToDB(sql);
 							data.setCode(0);

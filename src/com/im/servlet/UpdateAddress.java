@@ -18,32 +18,29 @@ public class UpdateAddress extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		DBUtils a = new DBUtils();		
-		System.out.println("request--->"+request.getRequestURL()+"===="+request.getParameterMap().toString());
-		String name = request.getParameter("name");
-		String address = request.getParameter("address");
+			response.setContentType("text/html;charset=utf-8");
+			
+//			String name = new String(request.getParameter("name").getBytes("ISO-8859-1"), "UTF-8");
+		String name = new String(request.getParameter("name").getBytes("ISO-8859-1"),"UTF-8");
+		String address =new String(request.getParameter("address").getBytes("ISO-8859-1"),"UTF-8");
 		String phone = request.getParameter("phone");
-		response.setContentType("text/html;charset=utf-8");
+		String stuId=request.getParameter("stuId");
+		System.out.println("update.address.name:"+name);
+		System.out.println("update.address.phone:"+phone);
+		System.out.println("update.address.address:"+address);
+		
 		if (address == null || name == null || phone == null) {
 			System.out.println("参数为空！");
 			return;
 		} 
-		
-		try {
-			address = a.hexStr2Str(address);
-		}
-		catch(Exception e1){
-			System.out.println(e1.toString());
-			return;
-		}
-		
-		
+			
 		BaseBean data = new BaseBean(); // 基类对象，回传给客户端的json对象
 		a.openConnect();
 		// 打开数据库连接
 		
 		
 		try {
-			a.updateDataToDB_Adress(name, address, phone);
+			a.updateDataToDB_Adress(name, address, phone,stuId);
 			data.setCode(0);
 			data.setMsg("地址更新成功！");
 		}
